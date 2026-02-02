@@ -80,6 +80,7 @@ pub(crate) async fn venv(
     concurrency: Concurrency,
     no_config: bool,
     no_project: bool,
+    install_dir: Option<&Path>,
     cache: &Cache,
     printer: Printer,
     relocatable: bool,
@@ -160,6 +161,7 @@ pub(crate) async fn venv(
             install_mirrors.python_install_mirror.as_deref(),
             install_mirrors.pypy_install_mirror.as_deref(),
             install_mirrors.python_downloads_json_url.as_deref(),
+            install_dir,
             preview,
         )
         .await?;

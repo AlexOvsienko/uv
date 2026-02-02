@@ -7000,6 +7000,7 @@ name = "uv-settings"
 version = "0.0.20"
 dependencies = [
  "clap",
+ "etcetera",
  "fs-err",
  "schemars",
  "serde",

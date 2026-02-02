@@ -723,6 +723,7 @@ impl ScriptInterpreter {
         keep_incompatible: bool,
         no_config: bool,
         active: Option<bool>,
+        install_dir: Option<&Path>,
         cache: &Cache,
         printer: Printer,
         preview: Preview,
@@ -779,6 +780,7 @@ impl ScriptInterpreter {
             install_mirrors.python_install_mirror.as_deref(),
             install_mirrors.pypy_install_mirror.as_deref(),
             install_mirrors.python_downloads_json_url.as_deref(),
+            install_dir,
             preview,
         )
         .await?
@@ -960,6 +962,7 @@ impl ProjectInterpreter {
         keep_incompatible: bool,
         no_config: bool,
         active: Option<bool>,
+        install_dir: Option<&Path>,
         cache: &Cache,
         printer: Printer,
         preview: Preview,
@@ -1061,6 +1064,7 @@ impl ProjectInterpreter {
             install_mirrors.python_install_mirror.as_deref(),
             install_mirrors.pypy_install_mirror.as_deref(),
             install_mirrors.python_downloads_json_url.as_deref(),
+            install_dir,
             preview,
         )
         .await?;
@@ -1349,6 +1353,7 @@ impl ProjectEnvironment {
         no_sync: bool,
         no_config: bool,
         active: Option<bool>,
+        install_dir: Option<&Path>,
         cache: &Cache,
         dry_run: DryRun,
         printer: Printer,
@@ -1379,6 +1384,7 @@ impl ProjectEnvironment {
             no_sync,
             no_config,
             active,
+            install_dir,
             cache,
             printer,
             preview,
@@ -1583,6 +1589,7 @@ impl ScriptEnvironment {
         no_sync: bool,
         no_config: bool,
         active: Option<bool>,
+        install_dir: Option<&Path>,
         cache: &Cache,
         dry_run: DryRun,
         printer: Printer,
@@ -1610,6 +1617,7 @@ impl ScriptEnvironment {
             no_sync,
             no_config,
             active,
+            install_dir,
             cache,
             printer,
             preview,
@@ -2587,6 +2595,7 @@ pub(crate) async fn init_script_python_requirement(
     python_downloads: PythonDownloads,
     no_config: bool,
     client_builder: &BaseClientBuilder<'_>,
+    install_dir: Option<&Path>,
     cache: &Cache,
     reporter: &PythonDownloadReporter,
     preview: Preview,
@@ -2621,6 +2630,7 @@ pub(crate) async fn init_script_python_requirement(
         install_mirrors.python_install_mirror.as_deref(),
         install_mirrors.pypy_install_mirror.as_deref(),
         install_mirrors.python_downloads_json_url.as_deref(),
+        install_dir,
         preview,
     )
     .await?

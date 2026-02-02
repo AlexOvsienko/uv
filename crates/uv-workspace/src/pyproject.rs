@@ -707,6 +707,20 @@ pub struct ToolUv {
     ///
     /// Note that those settings only apply when using the `uv_build` backend, other build backends
     /// (such as hatchling) have their own configuration.
+
+    /// The directory into which to install Python.
+    ///
+    /// The directory is relative to the `pyproject.toml` or `uv.toml` file.
+    /// Additionally you may use env variables like ${HOME} or ~.
+    #[option(
+        default = "None",
+        value_type = "str",
+        example = r#"
+            python-install-dir = ".python"
+        "#
+    )]
+    pub python_install_dir: Option<PathBuf>,
+
     #[option_group]
     pub build_backend: Option<BuildBackendSettingsSchema>,
 }

@@ -153,7 +153,7 @@ impl ManagedPythonInstallations {
     /// 2. The specific Python directory specified with the `UV_PYTHON_INSTALL_DIR` environment variable.
     /// 3. A directory in the system-appropriate user-level data directory, e.g., `~/.local/uv/python`.
     /// 4. A directory in the local data directory, e.g., `./.uv/python`.
-    pub fn from_settings(install_dir: Option<PathBuf>) -> Result<Self, Error> {
+    pub fn from_settings(install_dir: Option<&Path>) -> Result<Self, Error> {
         if let Some(install_dir) = install_dir {
             Ok(Self::from_path(install_dir))
         } else if let Some(install_dir) =

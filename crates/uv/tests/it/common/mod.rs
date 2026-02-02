@@ -1889,6 +1889,7 @@ pub fn python_installations_for_versions(
                 EnvironmentPreference::OnlySystem,
                 PythonPreference::Managed,
                 download_list,
+                None,
                 &cache,
                 Preview::default(),
             ) {

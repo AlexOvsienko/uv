@@ -2079,6 +2079,7 @@ mod tests {
                       "environments": null,
                       "required-environments": null,
                       "conflicts": null,
+                      "python-install-dir": null,
                       "build-backend": null
                     }
                   },
@@ -2180,6 +2181,7 @@ mod tests {
                       "environments": null,
                       "required-environments": null,
                       "conflicts": null,
+                      "python-install-dir": null,
                       "build-backend": null
                     }
                   },
@@ -2394,6 +2396,7 @@ mod tests {
                       "environments": null,
                       "required-environments": null,
                       "conflicts": null,
+                      "python-install-dir": null,
                       "build-backend": null
                     }
                   },
@@ -2504,6 +2507,7 @@ mod tests {
                       "environments": null,
                       "required-environments": null,
                       "conflicts": null,
+                      "python-install-dir": null,
                       "build-backend": null
                     }
                   },
@@ -2627,6 +2631,7 @@ mod tests {
                       "environments": null,
                       "required-environments": null,
                       "conflicts": null,
+                      "python-install-dir": null,
                       "build-backend": null
                     }
                   },
@@ -2724,6 +2729,7 @@ mod tests {
                       "environments": null,
                       "required-environments": null,
                       "conflicts": null,
+                      "python-install-dir": null,
                       "build-backend": null
                     }
                   },

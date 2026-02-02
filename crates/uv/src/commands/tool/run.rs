@@ -120,6 +120,7 @@ pub(crate) async fn run(
     python_downloads: PythonDownloads,
     installer_metadata: bool,
     concurrency: Concurrency,
+    install_dir: Option<&Path>,
     cache: Cache,
     printer: Printer,
     env_file: Vec<PathBuf>,
@@ -305,6 +306,7 @@ pub(crate) async fn run(
         python_downloads,
         installer_metadata,
         concurrency,
+        install_dir,
         &cache,
         printer,
         preview,
@@ -737,6 +739,7 @@ async fn get_or_create_environment(
     python_downloads: PythonDownloads,
     installer_metadata: bool,
     concurrency: Concurrency,
+    install_dir: Option<&Path>,
     cache: &Cache,
     printer: Printer,
     preview: Preview,
@@ -789,6 +792,7 @@ async fn get_or_create_environment(
         install_mirrors.python_install_mirror.as_deref(),
         install_mirrors.pypy_install_mirror.as_deref(),
         install_mirrors.python_downloads_json_url.as_deref(),
+        install_dir,
         preview,
     )
     .await?
@@ -1174,6 +1178,7 @@ async fn get_or_create_environment(
                     &install_mirrors,
                     python_preference,
                     python_downloads,
+                    install_dir,
                     cache,
                     preview,
                 )

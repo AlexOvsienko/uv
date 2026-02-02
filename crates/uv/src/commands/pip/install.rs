@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+use std::path::Path;
 
 use anyhow::Context;
 use itertools::Itertools;
@@ -99,6 +100,7 @@ pub(crate) async fn pip_install(
     prefix: Option<Prefix>,
     python_preference: PythonPreference,
     concurrency: Concurrency,
+    install_dir: Option<&Path>,
     cache: Cache,
     dry_run: DryRun,
     printer: Printer,
@@ -199,6 +201,7 @@ pub(crate) async fn pip_install(
             install_mirrors.python_install_mirror.as_deref(),
             install_mirrors.pypy_install_mirror.as_deref(),
             install_mirrors.python_downloads_json_url.as_deref(),
+            install_dir,
             preview,
         )
         .await?;
@@ -212,6 +215,7 @@ pub(crate) async fn pip_install(
                 .unwrap_or_default(),
             EnvironmentPreference::from_system_flag(system, true),
             PythonPreference::default().with_system_flag(system),
+            install_dir,
             &cache,
             preview,
         )?;

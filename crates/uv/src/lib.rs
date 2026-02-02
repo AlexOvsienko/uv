@@ -680,6 +680,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 globals.python_preference,
                 globals.concurrency,
                 globals.quiet > 0,
+                globals.python_install_dir.as_deref(),
                 cache,
                 printer,
                 globals.preview,
@@ -765,6 +766,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 args.settings.sources,
                 globals.python_preference,
                 globals.concurrency,
+                globals.python_install_dir.as_deref(),
                 cache,
                 args.dry_run,
                 printer,
@@ -923,6 +925,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 args.settings.prefix,
                 globals.python_preference,
                 globals.concurrency,
+                globals.python_install_dir.as_deref(),
                 cache,
                 args.dry_run,
                 printer,
@@ -957,6 +960,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 args.settings.break_system_packages,
                 args.settings.target,
                 args.settings.prefix,
+                globals.python_install_dir.as_deref(),
                 cache,
                 args.settings.keyring_provider,
                 &client_builder.subcommand(vec!["pip".to_owned(), "uninstall".to_owned()]),
@@ -985,6 +989,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 args.settings.target,
                 args.settings.prefix,
                 args.paths,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -1019,6 +1024,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 args.settings.system,
                 args.settings.target,
                 args.settings.prefix,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -1043,6 +1049,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 args.settings.target,
                 args.settings.prefix,
                 args.files,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -1075,6 +1082,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 args.settings.exclude_newer,
                 args.settings.python.as_deref(),
                 args.settings.system,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -1096,6 +1104,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 args.settings.system,
                 args.settings.python_version.as_ref(),
                 args.settings.python_platform.as_ref(),
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -1171,6 +1180,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 globals.python_preference,
                 globals.python_downloads,
                 globals.concurrency,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -1247,6 +1257,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 globals.concurrency,
                 cli.top_level.no_config,
                 args.no_project,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 args.relocatable
@@ -1443,6 +1454,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 globals.python_downloads,
                 globals.installer_metadata,
                 globals.concurrency,
+                globals.python_install_dir.as_deref(),
                 cache,
                 printer,
                 args.env_file,
@@ -1543,6 +1555,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 globals.python_downloads,
                 globals.installer_metadata,
                 globals.concurrency,
+                globals.python_install_dir.as_deref(),
                 cli.top_level.no_config,
                 cache,
                 printer,
@@ -1596,6 +1609,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 globals.python_downloads,
                 globals.installer_metadata,
                 globals.concurrency,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -1651,6 +1665,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 globals.python_preference,
                 globals.python_downloads,
                 &client_builder.subcommand(vec!["python".to_owned(), "list".to_owned()]),
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -1661,7 +1676,8 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
             command: PythonCommand::Install(args),
         }) => {
             // Resolve the settings from the command-line arguments and workspace configuration.
-            let args = settings::PythonInstallSettings::resolve(args, filesystem, environment);
+            let args =
+                settings::PythonInstallSettings::resolve(args, filesystem.as_ref(), environment);
             show_settings!(args);
 
             // Initialize the cache.
@@ -1669,7 +1685,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
 
             commands::python_install(
                 &project_dir,
-                args.install_dir,
+                args.install_dir.as_deref(),
                 args.targets,
                 args.reinstall,
                 args.upgrade,
@@ -1704,7 +1720,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
 
             commands::python_install(
                 &project_dir,
-                args.install_dir,
+                args.install_dir.as_deref(),
                 args.targets,
                 args.reinstall,
                 upgrade,
@@ -1733,7 +1749,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
             let args = settings::PythonUninstallSettings::resolve(args, filesystem);
             show_settings!(args);
 
-            commands::python_uninstall(args.install_dir, args.targets, args.all, printer).await
+            commands::python_uninstall(args.install_dir.as_deref(), args.targets, args.all, printer).await
         }
         Commands::Python(PythonNamespace {
             command: PythonCommand::Find(args),
@@ -1754,6 +1770,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                     globals.python_preference,
                     globals.python_downloads,
                     cli.top_level.no_config,
+                    globals.python_install_dir.as_deref(),
                     &cache,
                     printer,
                     globals.preview,
@@ -1771,6 +1788,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                     globals.python_preference,
                     args.python_downloads_json_url.as_deref(),
                     &client_builder.subcommand(vec!["python".to_owned(), "find".to_owned()]),
+                    globals.python_install_dir.as_deref(),
                     &cache,
                     printer,
                     globals.preview,
@@ -1798,6 +1816,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
                 args.rm,
                 args.install_mirrors,
                 client_builder.subcommand(vec!["python".to_owned(), "pin".to_owned()]),
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -1811,7 +1830,7 @@ async fn run(mut cli: Cli) -> Result<ExitStatus> {
             let args = settings::PythonDirSettings::resolve(args, filesystem);
             show_settings!(args);
 
-            commands::python_dir(args.bin, printer)?;
+            commands::python_dir(args.bin, globals.python_install_dir.as_deref(), printer)?;
             Ok(ExitStatus::Success)
         }
         Commands::Python(PythonNamespace {
@@ -2005,6 +2024,7 @@ async fn run_project(
                 globals.python_preference,
                 globals.python_downloads,
                 no_config,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -2072,6 +2092,7 @@ async fn run_project(
                 globals.python_downloads,
                 globals.installer_metadata,
                 globals.concurrency,
+                globals.python_install_dir.as_deref(),
                 cache,
                 printer,
                 args.env_file,
@@ -2128,6 +2149,7 @@ async fn run_project(
                 globals.installer_metadata,
                 globals.concurrency,
                 no_config,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -2180,6 +2202,7 @@ async fn run_project(
                 globals.python_downloads,
                 globals.concurrency,
                 no_config,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -2314,6 +2337,7 @@ async fn run_project(
                 globals.installer_metadata,
                 globals.concurrency,
                 no_config,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -2363,6 +2387,7 @@ async fn run_project(
                 globals.installer_metadata,
                 globals.concurrency,
                 no_config,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -2408,6 +2433,7 @@ async fn run_project(
                 globals.installer_metadata,
                 globals.concurrency,
                 no_config,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -2453,6 +2479,7 @@ async fn run_project(
                 globals.python_downloads,
                 globals.concurrency,
                 no_config,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,
@@ -2500,6 +2527,7 @@ async fn run_project(
                 globals.concurrency,
                 no_config,
                 globals.quiet > 0,
+                globals.python_install_dir.as_deref(),
                 &cache,
                 printer,
                 globals.preview,

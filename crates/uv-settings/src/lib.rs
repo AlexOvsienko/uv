@@ -299,6 +299,7 @@ fn warn_uv_toml_masked_fields(options: &Options) {
                 preview,
                 python_preference,
                 python_downloads,
+                python_install_dir,
                 concurrent_downloads,
                 concurrent_builds,
                 concurrent_installs,
@@ -399,6 +400,9 @@ fn warn_uv_toml_masked_fields(options: &Options) {
     }
     if python_downloads.is_some() {
         masked_fields.push("python-downloads");
+    }
+    if python_install_dir.is_some() {
+        masked_fields.push("python-install-dir");
     }
     if concurrent_downloads.is_some() {
         masked_fields.push("concurrent-downloads");
@@ -619,6 +623,7 @@ pub struct EnvironmentOptions {
     pub skip_wheel_filename_check: Option<bool>,
     pub hide_build_output: Option<bool>,
     pub python_install_bin: Option<bool>,
+    pub python_install_dir: Option<PathBuf>,
     pub python_install_registry: Option<bool>,
     pub install_mirrors: PythonInstallMirrors,
     pub log_context: Option<bool>,
@@ -677,6 +682,7 @@ impl EnvironmentOptions {
             )?,
             hide_build_output: parse_boolish_environment_variable(EnvVars::UV_HIDE_BUILD_OUTPUT)?,
             python_install_bin: parse_boolish_environment_variable(EnvVars::UV_PYTHON_INSTALL_BIN)?,
+            python_install_dir: parse_path_environment_variable(EnvVars::UV_PYTHON_INSTALL_DIR),
             python_install_registry: parse_boolish_environment_variable(
                 EnvVars::UV_PYTHON_INSTALL_REGISTRY,
             )?,
@@ -812,7 +818,6 @@ where
     }
 }
 
-#[cfg(feature = "tracing-durations-export")]
 /// Parse a path environment variable.
 fn parse_path_environment_variable(name: &'static str) -> Option<PathBuf> {
     let value = std::env::var_os(name)?;
@@ -821,7 +826,28 @@ fn parse_path_environment_variable(name: &'static str) -> Option<PathBuf> {
         return None;
     }
 
-    Some(PathBuf::from(value))
+    Some(expand_path(PathBuf::from(value)))
+}
+
+/// Expand environment variables in a path.
+/// Expand environment variables and tilde in a path.
+pub(crate) fn expand_path(path: PathBuf) -> PathBuf {
+    let path_str = path.to_string_lossy();
+    let expanded = uv_pep508::expand_env_vars(&path_str);
+    let path = if let std::borrow::Cow::Borrowed(_) = expanded {
+        path
+    } else {
+        PathBuf::from(expanded.into_owned())
+    };
+
+    // If the path starts with `~`, expand it to the user's home directory.
+    if let Ok(path) = path.strip_prefix("~") {
+        if let Ok(home) = etcetera::home_dir() {
+            return home.join(path);
+        }
+    }
+
+    path
 }
 
 /// Populate the [`EnvironmentFlags`] from the given [`EnvironmentOptions`].
@@ -835,5 +861,33 @@ impl From<&EnvironmentOptions> for EnvironmentFlags {
             flags.insert(Self::HIDE_BUILD_OUTPUT);
         }
         flags
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_expand_path_tilde() {
+        if let Ok(home) = etcetera::home_dir() {
+            let path = PathBuf::from("~/foo/bar");
+            let expanded = expand_path(path);
+            assert_eq!(expanded, home.join("foo/bar"));
+
+            let path = PathBuf::from("~");
+            let expanded = expand_path(path);
+            assert_eq!(expanded, home);
+        }
+    }
+
+    #[test]
+    fn test_expand_path_env_var() {
+        if let Ok(home) = std::env::var("HOME") {
+            let path = PathBuf::from("${HOME}/foo");
+            let expanded = expand_path(path);
+            assert_ne!(expanded, PathBuf::from("${HOME}/foo"));
+            assert_eq!(expanded, PathBuf::from(home).join("foo"));
+        }
     }
 }

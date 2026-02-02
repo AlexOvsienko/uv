@@ -189,6 +189,15 @@ pub struct GlobalArgs {
     )]
     pub no_managed_python: bool,
 
+    /// Directory to install managed Python versions [env: `UV_PYTHON_INSTALL_DIR`=]
+    #[arg(
+        global = true,
+        long,
+        value_hint = ValueHint::DirPath,
+        help_heading = "Python options",
+    )]
+    pub python_install_dir: Option<PathBuf>,
+
     #[expect(clippy::doc_markdown)]
     /// Allow automatically downloading Python when required. [env: "UV_PYTHON_DOWNLOADS=auto"]
     #[arg(global = true, long, help_heading = "Python options", hide = true)]

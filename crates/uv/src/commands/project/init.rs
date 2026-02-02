@@ -61,6 +61,7 @@ pub(crate) async fn init(
     python_preference: PythonPreference,
     python_downloads: PythonDownloads,
     no_config: bool,
+    install_dir: Option<&Path>,
     cache: &Cache,
     printer: Printer,
     preview: Preview,
@@ -79,6 +80,7 @@ pub(crate) async fn init(
                 client_builder,
                 python_preference,
                 python_downloads,
+                install_dir,
                 cache,
                 printer,
                 no_workspace,
@@ -162,6 +164,7 @@ pub(crate) async fn init(
                 python_preference,
                 python_downloads,
                 no_config,
+                install_dir,
                 cache,
                 printer,
                 preview,
@@ -208,6 +211,7 @@ async fn init_script(
     client_builder: &BaseClientBuilder<'_>,
     python_preference: PythonPreference,
     python_downloads: PythonDownloads,
+    install_dir: Option<&Path>,
     cache: &Cache,
     printer: Printer,
     no_workspace: bool,
@@ -267,6 +271,7 @@ async fn init_script(
         python_downloads,
         no_config,
         client_builder,
+        install_dir,
         cache,
         &reporter,
         preview,
@@ -304,6 +309,7 @@ async fn init_project(
     python_preference: PythonPreference,
     python_downloads: PythonDownloads,
     no_config: bool,
+    install_dir: Option<&Path>,
     cache: &Cache,
     printer: Printer,
     preview: Preview,
@@ -387,6 +393,7 @@ async fn init_project(
         client_builder,
         python_preference,
         python_downloads,
+        install_dir,
         cache,
         preview,
         workspace.as_ref(),
@@ -493,6 +500,7 @@ async fn determine_requires_python(
     client_builder: &BaseClientBuilder<'_>,
     python_preference: PythonPreference,
     python_downloads: PythonDownloads,
+    install_dir: Option<&Path>,
     cache: &Cache,
     preview: Preview,
     workspace: Option<&Workspace>,
@@ -558,6 +566,7 @@ async fn determine_requires_python(
                         install_mirrors.python_install_mirror.as_deref(),
                         install_mirrors.pypy_install_mirror.as_deref(),
                         install_mirrors.python_downloads_json_url.as_deref(),
+                        install_dir,
                         preview,
                     )
                     .await?
@@ -586,6 +595,7 @@ async fn determine_requires_python(
                     install_mirrors.python_install_mirror.as_deref(),
                     install_mirrors.pypy_install_mirror.as_deref(),
                     install_mirrors.python_downloads_json_url.as_deref(),
+                    install_dir,
                     preview,
                 )
                 .await?
@@ -659,6 +669,7 @@ async fn determine_requires_python(
                 install_mirrors.python_install_mirror.as_deref(),
                 install_mirrors.pypy_install_mirror.as_deref(),
                 install_mirrors.python_downloads_json_url.as_deref(),
+                install_dir,
                 preview,
             )
             .await?
@@ -689,6 +700,7 @@ async fn determine_requires_python(
             install_mirrors.python_install_mirror.as_deref(),
             install_mirrors.pypy_install_mirror.as_deref(),
             install_mirrors.python_downloads_json_url.as_deref(),
+            install_dir,
             preview,
         )
         .await?

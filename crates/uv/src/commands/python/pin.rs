@@ -37,6 +37,7 @@ pub(crate) async fn pin(
     rm: bool,
     install_mirrors: PythonInstallMirrors,
     client_builder: BaseClientBuilder<'_>,
+    install_dir: Option<&Path>,
     cache: &Cache,
     printer: Printer,
     preview: Preview,
@@ -107,6 +108,7 @@ pub(crate) async fn pin(
                         virtual_project,
                         python_preference,
                         &download_list,
+                        install_dir,
                         cache,
                         preview,
                     );
@@ -135,6 +137,7 @@ pub(crate) async fn pin(
         install_mirrors.python_install_mirror.as_deref(),
         install_mirrors.pypy_install_mirror.as_deref(),
         install_mirrors.python_downloads_json_url.as_deref(),
+        install_dir,
         preview,
     )
     .await
@@ -249,6 +252,7 @@ fn warn_if_existing_pin_incompatible_with_project(
     virtual_project: &VirtualProject,
     python_preference: PythonPreference,
     downloads_list: &ManagedPythonDownloadList,
+    install_dir: Option<&Path>,
     cache: &Cache,
     preview: Preview,
 ) {
@@ -275,6 +279,7 @@ fn warn_if_existing_pin_incompatible_with_project(
         EnvironmentPreference::OnlySystem,
         python_preference,
         downloads_list,
+        install_dir,
         cache,
         preview,
     ) {

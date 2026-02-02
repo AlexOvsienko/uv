@@ -1,4 +1,5 @@
 use std::fmt::Write;
+use std::path::Path;
 
 use anyhow::Result;
 use itertools::{Either, Itertools};
@@ -31,6 +32,7 @@ pub(crate) async fn pip_uninstall(
     break_system_packages: bool,
     target: Option<Target>,
     prefix: Option<Prefix>,
+    install_dir: Option<&Path>,
     cache: Cache,
     keyring_provider: KeyringProviderType,
     client_builder: &BaseClientBuilder<'_>,
@@ -53,6 +55,7 @@ pub(crate) async fn pip_uninstall(
             .unwrap_or_default(),
         EnvironmentPreference::from_system_flag(system, true),
         PythonPreference::default().with_system_flag(system),
+        install_dir,
         &cache,
         preview,
     )?;

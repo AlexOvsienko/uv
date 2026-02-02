@@ -1,4 +1,5 @@
 use std::fmt::Write;
+use std::path::Path;
 use std::time::Instant;
 
 use anyhow::Result;
@@ -24,6 +25,7 @@ pub(crate) fn pip_check(
     system: bool,
     python_version: Option<&PythonVersion>,
     python_platform: Option<&TargetTriple>,
+    install_dir: Option<&Path>,
     cache: &Cache,
     printer: Printer,
     preview: Preview,
@@ -35,6 +37,7 @@ pub(crate) fn pip_check(
         &python.map(PythonRequest::parse).unwrap_or_default(),
         EnvironmentPreference::from_system_flag(system, false),
         PythonPreference::default().with_system_flag(system),
+        install_dir,
         cache,
         preview,
     )?;

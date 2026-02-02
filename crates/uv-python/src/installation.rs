@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 use std::fmt;
 use std::hash::{Hash, Hasher};
+use std::path::Path;
 use std::str::FromStr;
 
 use indexmap::IndexMap;
@@ -64,11 +65,18 @@ impl PythonInstallation {
         environments: EnvironmentPreference,
         preference: PythonPreference,
         download_list: &ManagedPythonDownloadList,
+        install_dir: Option<&Path>,
         cache: &Cache,
         preview: Preview,
     ) -> Result<Self, Error> {
-        let installation =
-            find_python_installation(request, environments, preference, cache, preview)??;
+        let installation = find_python_installation(
+            request,
+            environments,
+            preference,
+            install_dir,
+            cache,
+            preview,
+        )??;
         installation.warn_if_outdated_prerelease(request, download_list);
         Ok(installation)
     }
@@ -86,6 +94,7 @@ impl PythonInstallation {
         python_install_mirror: Option<&str>,
         pypy_install_mirror: Option<&str>,
         python_downloads_json_url: Option<&str>,
+        install_dir: Option<&Path>,
         preview: Preview,
     ) -> Result<Self, Error> {
         let retry_policy = client_builder.retry_policy();
@@ -107,6 +116,7 @@ impl PythonInstallation {
             reporter,
             python_install_mirror,
             pypy_install_mirror,
+            install_dir,
             preview,
         )
         .await?;
@@ -128,6 +138,7 @@ impl PythonInstallation {
         python_install_mirror: Option<&str>,
         pypy_install_mirror: Option<&str>,
         python_downloads_json_url: Option<&str>,
+        install_dir: Option<&Path>,
         preview: Preview,
     ) -> Result<Self, Error> {
         let request = request.unwrap_or(&PythonRequest::Default);
@@ -145,6 +156,7 @@ impl PythonInstallation {
             environments,
             preference,
             &download_list,
+            install_dir,
             cache,
             preview,
         ) {
@@ -260,6 +272,7 @@ impl PythonInstallation {
             reporter,
             python_install_mirror,
             pypy_install_mirror,
+            install_dir,
         )
         .await?;
 
@@ -277,8 +290,9 @@ impl PythonInstallation {
         reporter: Option<&dyn Reporter>,
         python_install_mirror: Option<&str>,
         pypy_install_mirror: Option<&str>,
+        install_dir: Option<&Path>,
     ) -> Result<Self, Error> {
-        let installations = ManagedPythonInstallations::from_settings(None)?.init()?;
+        let installations = ManagedPythonInstallations::from_settings(install_dir)?.init()?;
         let installations_dir = installations.root();
         let scratch_dir = installations.scratch();
         let _lock = installations.lock().await?;

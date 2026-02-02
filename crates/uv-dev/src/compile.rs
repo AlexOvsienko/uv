@@ -13,6 +13,7 @@ pub(crate) struct CompileArgs {
     /// Compile all `.py` in this or any subdirectory to bytecode
     root: PathBuf,
     python: Option<PathBuf>,
+    install_dir: Option<PathBuf>,
     #[command(flatten)]
     cache_args: CacheArgs,
 }
@@ -27,6 +28,7 @@ pub(crate) async fn compile(args: CompileArgs) -> anyhow::Result<()> {
             &PythonRequest::default(),
             EnvironmentPreference::OnlyVirtual,
             PythonPreference::default(),
+            args.install_dir.as_deref(),
             &cache,
             Preview::default(),
         )?

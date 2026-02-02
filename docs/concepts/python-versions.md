@@ -290,7 +290,8 @@ $ uv python find --system
 
 When searching for a Python version, the following locations are checked:
 
-- Managed Python installations in the `UV_PYTHON_INSTALL_DIR`.
+- Managed Python installations in the `UV_PYTHON_INSTALL_DIR`. (See:
+  [Managed Python installation directory](#managed-python-installation-directory).)
 - A Python interpreter on the `PATH` as `python`, `python3`, or `python3.x` on macOS and Linux, or
   `python.exe` on Windows.
 - On Windows, the Python interpreters in the Windows registry and Microsoft Store Python
@@ -437,6 +438,46 @@ Implementation name requests are not case-sensitive.
 
 See the [Python version request](#requesting-a-version) documentation for more details on the
 supported formats.
+
+## Managed Python installation directory
+
+By default, uv installs managed Python versions into the `python` directory within the
+[data directory](../reference/settings.md#cache-dir).
+
+On Linux and macOS, this is typically `~/.local/share/uv/python`. On Windows, this is typically
+`%LOCALAPPDATA%\uv\python`.
+
+To change the installation directory, use the `python-install-dir` setting in a `uv.toml` file or
+the `UV_PYTHON_INSTALL_DIR` environment variable.
+
+For example, to configure uv to install Python versions into a `.python` directory in the project
+root:
+
+```toml title="uv.toml"
+python-install-dir = ".python"
+```
+
+Or, to set the directory globally via an environment variable:
+
+```console
+$ export UV_PYTHON_INSTALL_DIR=/path/to/python
+```
+
+### Path expansion
+
+The `python-install-dir` setting, along with other path-based settings, supports environment
+variable expansion using the `${VAR}` syntax.
+
+Only uppercase variable names are supported (e.g., `${HOME}`, `${XDG_DATA_HOME}`,
+`${UV_PYTHON_INSTALL_DIR}`).
+
+A special `${PROJECT_ROOT}` variable is available, which resolves to the project root directory.
+
+For example, to install Python versions into a `.python` directory within the project root:
+
+```toml title="uv.toml"
+python-install-dir = "${PROJECT_ROOT}/.python"
+```
 
 ## Managed Python distributions
 

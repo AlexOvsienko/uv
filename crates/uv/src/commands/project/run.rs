@@ -105,6 +105,7 @@ pub(crate) async fn run(
     python_downloads: PythonDownloads,
     installer_metadata: bool,
     concurrency: Concurrency,
+    install_dir: Option<&Path>,
     cache: Cache,
     printer: Printer,
     env_file: EnvFile,
@@ -245,6 +246,7 @@ hint: If you are running a script with `{}` in the shebang, you may need to incl
                 no_sync,
                 no_config,
                 active.map_or(Some(false), Some),
+                install_dir,
                 &cache,
                 DryRun::Disabled,
                 printer,
@@ -393,6 +395,7 @@ hint: If you are running a script with `{}` in the shebang, you may need to incl
                     no_sync,
                     no_config,
                     active.map_or(Some(false), Some),
+                    install_dir,
                     &cache,
                     DryRun::Disabled,
                     printer,
@@ -479,6 +482,7 @@ hint: If you are running a script with `{}` in the shebang, you may need to incl
                     no_sync,
                     no_config,
                     active.map_or(Some(false), Some),
+                    install_dir,
                     &cache,
                     printer,
                     preview,
@@ -688,6 +692,7 @@ hint: If you are running a script with `{}` in the shebang, you may need to incl
                     install_mirrors.python_install_mirror.as_deref(),
                     install_mirrors.pypy_install_mirror.as_deref(),
                     install_mirrors.python_downloads_json_url.as_deref(),
+                    install_dir,
                     preview,
                 )
                 .await?
@@ -731,6 +736,7 @@ hint: If you are running a script with `{}` in the shebang, you may need to incl
                     no_sync,
                     no_config,
                     active,
+                    install_dir,
                     &cache,
                     DryRun::Disabled,
                     printer,
@@ -929,6 +935,7 @@ hint: If you are running a script with `{}` in the shebang, you may need to incl
                     install_mirrors.python_install_mirror.as_deref(),
                     install_mirrors.pypy_install_mirror.as_deref(),
                     install_mirrors.python_downloads_json_url.as_deref(),
+                    install_dir,
                     preview,
                 )
                 .await?;

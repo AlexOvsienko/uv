@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 use std::fmt::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use futures::StreamExt;
@@ -25,7 +25,7 @@ use crate::printer::Printer;
 
 /// Uninstall managed Python versions.
 pub(crate) async fn uninstall(
-    install_dir: Option<PathBuf>,
+    install_dir: Option<&Path>,
     targets: Vec<String>,
     all: bool,
     printer: Printer,

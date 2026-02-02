@@ -1,5 +1,5 @@
 use std::fmt::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use itertools::Itertools;
@@ -30,6 +30,7 @@ pub(crate) fn pip_freeze(
     target: Option<Target>,
     prefix: Option<Prefix>,
     paths: Option<Vec<PathBuf>>,
+    install_dir: Option<&Path>,
     cache: &Cache,
     printer: Printer,
     preview: Preview,
@@ -39,6 +40,7 @@ pub(crate) fn pip_freeze(
         &python.map(PythonRequest::parse).unwrap_or_default(),
         EnvironmentPreference::from_system_flag(system, false),
         PythonPreference::default().with_system_flag(system),
+        install_dir,
         cache,
         preview,
     )?;

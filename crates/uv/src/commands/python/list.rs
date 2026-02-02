@@ -1,6 +1,7 @@
 use serde::Serialize;
 use std::collections::BTreeSet;
 use std::fmt::Write;
+use std::path::Path;
 use uv_cli::PythonListFormat;
 use uv_pep440::Version;
 use uv_preview::Preview;
@@ -67,6 +68,7 @@ pub(crate) async fn list(
     python_preference: PythonPreference,
     python_downloads: PythonDownloads,
     client_builder: &BaseClientBuilder<'_>,
+    install_dir: Option<&Path>,
     cache: &Cache,
     printer: Printer,
     preview: Preview,
@@ -138,6 +140,7 @@ pub(crate) async fn list(
                 request.as_ref().unwrap_or(&PythonRequest::Any),
                 EnvironmentPreference::OnlySystem,
                 python_preference,
+                install_dir,
                 cache,
                 preview,
             )

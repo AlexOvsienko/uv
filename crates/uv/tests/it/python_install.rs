@@ -4322,3 +4322,57 @@ fn python_install_compile_bytecode_pypy() {
     Bytecode compiled [COUNT] files in [TIME]
     ");
 }
+
+#[test]
+fn python_install_dir_config_precedence() {
+    let context: TestContext = TestContext::new_with_versions(&[])
+        .with_filtered_python_keys()
+        .with_filtered_exe_suffix()
+        .with_filtered_latest_python_versions()
+        .with_managed_python_dirs()
+        .with_python_download_cache();
+
+    let config_dir = context.temp_dir.child("config_dir");
+    let env_dir = context.temp_dir.child("env_dir");
+
+    // Write uv.toml with python-install-dir pointing to config_dir
+    let config_path = config_dir.path().to_string_lossy().replace('\\', "/");
+    context
+        .temp_dir
+        .child("uv.toml")
+        .write_str(&format!("python-install-dir = \"{config_path}\"\n"))
+        .unwrap();
+
+    // Install a python version
+    // We expect it to go to env_dir, IGNORING config_dir (Env > Config)
+    uv_snapshot!(context.filters(), context.python_install()
+        .arg("3.12")
+        .env(EnvVars::UV_PYTHON_INSTALL_DIR, env_dir.path())
+        .env(EnvVars::UV_CONFIG_FILE, "uv.toml"), @"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    
+    ----- stderr -----
+    Installed Python 3.12.[LATEST] in [TIME]
+     + cpython-3.12.[LATEST]-[PLATFORM] (python3.12)
+    ");
+
+    // Assert env_dir has content
+    assert!(
+        env_dir.path().exists(),
+        "env_dir should exist and contain python"
+    );
+    assert!(
+        env_dir.path().read_dir().unwrap().next().is_some(),
+        "env_dir should not be empty"
+    );
+
+    // Assert config_dir does NOT exist or is empty
+    if config_dir.path().exists() {
+        assert!(
+            config_dir.path().read_dir().unwrap().next().is_none(),
+            "config_dir should be empty"
+        );
+    }
+}

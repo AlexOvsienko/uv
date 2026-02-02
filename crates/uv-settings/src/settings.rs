@@ -173,7 +173,19 @@ impl Options {
 
     /// Resolve the [`Options`] relative to the given root directory.
     pub fn relative_to(self, root_dir: &Path) -> Result<Self, IndexUrlError> {
+        let globals = if let Some(python_install_dir) = self.globals.python_install_dir {
+            let python_install_dir = crate::expand_path(python_install_dir);
+            let python_install_dir = root_dir.join(python_install_dir);
+            GlobalOptions {
+                python_install_dir: Some(python_install_dir),
+                ..self.globals
+            }
+        } else {
+            self.globals
+        };
+
         Ok(Self {
+            globals,
             top_level: self.top_level.relative_to(root_dir)?,
             pip: self.pip.map(|pip| pip.relative_to(root_dir)).transpose()?,
             ..self
@@ -280,6 +292,22 @@ pub struct GlobalOptions {
         possible_values = true
     )]
     pub python_downloads: Option<PythonDownloads>,
+    /// The directory to store managed Python installations in.
+    ///
+    /// Defaults to `$XDG_DATA_HOME/uv/python` or `$HOME/.local/share/uv/python` on Linux and macOS,
+    /// and `%LOCALAPPDATA%\uv\python` on Windows.
+    ///
+    /// This configuration is not supported in `pyproject.toml`, as it requires a stable path across
+    /// all project contributors; however, it can be set in a `uv.toml` or `uv.lock` file, or via the
+    /// `UV_PYTHON_INSTALL_DIR` environment variable.
+    #[option(
+        default = "None",
+        value_type = "str",
+        example = r#"
+            python-install-dir = "./.uv/python"
+        "#
+    )]
+    pub python_install_dir: Option<PathBuf>,
     /// The maximum number of in-flight concurrent downloads that uv will perform at any given
     /// time.
     #[option(
@@ -2155,6 +2183,7 @@ pub struct OptionsWire {
     preview: Option<bool>,
     python_preference: Option<PythonPreference>,
     python_downloads: Option<PythonDownloads>,
+    python_install_dir: Option<PathBuf>,
     concurrent_downloads: Option<NonZeroUsize>,
     concurrent_builds: Option<NonZeroUsize>,
     concurrent_installs: Option<NonZeroUsize>,
@@ -2254,6 +2283,7 @@ impl From<OptionsWire> for Options {
             preview,
             python_preference,
             python_downloads,
+            python_install_dir,
             python_install_mirror,
             pypy_install_mirror,
             python_downloads_json_url,
@@ -2330,6 +2360,7 @@ impl From<OptionsWire> for Options {
                 preview,
                 python_preference,
                 python_downloads,
+                python_install_dir,
                 concurrent_downloads,
                 concurrent_builds,
                 concurrent_installs,

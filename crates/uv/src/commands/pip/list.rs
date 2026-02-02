@@ -1,5 +1,6 @@
 use std::cmp::max;
 use std::fmt::Write;
+use std::path::Path;
 
 use anyhow::Result;
 use futures::StreamExt;
@@ -53,6 +54,7 @@ pub(crate) async fn pip_list(
     system: bool,
     target: Option<Target>,
     prefix: Option<Prefix>,
+    install_dir: Option<&Path>,
     cache: &Cache,
     printer: Printer,
     preview: Preview,
@@ -67,6 +69,7 @@ pub(crate) async fn pip_list(
         &python.map(PythonRequest::parse).unwrap_or_default(),
         EnvironmentPreference::from_system_flag(system, false),
         PythonPreference::default().with_system_flag(system),
+        install_dir,
         cache,
         preview,
     )?;

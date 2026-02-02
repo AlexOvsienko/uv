@@ -1,4 +1,4 @@
-use std::fmt::Write;
+use std::{fmt::Write, path::Path};
 
 use anyhow::Context;
 use owo_colors::OwoColorize;
@@ -9,12 +9,12 @@ use uv_python::managed::{ManagedPythonInstallations, python_executable_dir};
 use crate::printer::Printer;
 
 /// Show the Python installation directory.
-pub(crate) fn dir(bin: bool, printer: Printer) -> anyhow::Result<()> {
+pub(crate) fn dir(bin: bool, install_dir: Option<&Path>, printer: Printer) -> anyhow::Result<()> {
     if bin {
         let bin = python_executable_dir()?;
         writeln!(printer.stdout(), "{}", bin.simplified_display().cyan())?;
     } else {
-        let installed_toolchains = ManagedPythonInstallations::from_settings(None)
+        let installed_toolchains = ManagedPythonInstallations::from_settings(install_dir)
             .context("Failed to initialize toolchain settings")?;
         writeln!(
             printer.stdout(),

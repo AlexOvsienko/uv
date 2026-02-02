@@ -153,15 +153,21 @@ impl PythonEnvironment {
         request: &PythonRequest,
         preference: EnvironmentPreference,
         python_preference: PythonPreference,
+        install_dir: Option<&Path>,
         cache: &Cache,
         preview: Preview,
     ) -> Result<Self, Error> {
-        let installation =
-            match find_python_installation(request, preference, python_preference, cache, preview)?
-            {
-                Ok(installation) => installation,
-                Err(err) => return Err(EnvironmentNotFound::from(err).into()),
-            };
+        let installation = match find_python_installation(
+            request,
+            preference,
+            python_preference,
+            install_dir,
+            cache,
+            preview,
+        )? {
+            Ok(installation) => installation,
+            Err(err) => return Err(EnvironmentNotFound::from(err).into()),
+        };
         Ok(Self::from_installation(installation))
     }
 

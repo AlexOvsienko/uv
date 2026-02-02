@@ -12,6 +12,13 @@ If Python is already installed on your system, uv will
 install and manage Python versions. uv [automatically installs](#automatic-python-downloads) missing
 Python versions as needed — you don't need to install Python to get started.
 
+!!! tip
+
+    Managed Python versions are installed in a directory within the uv data directory (e.g.,
+    `~/.local/share/uv/python` on macOS). To change the installation directory, use the
+    [`python-install-dir`](../concepts/python-versions.md#managed-python-installation-directory)
+    setting.
+
 ## Getting started
 
 To install the latest Python version:

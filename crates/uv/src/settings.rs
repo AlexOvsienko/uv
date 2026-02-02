@@ -80,6 +80,7 @@ pub(crate) struct GlobalSettings {
     pub(crate) preview: Preview,
     pub(crate) python_preference: PythonPreference,
     pub(crate) python_downloads: PythonDownloads,
+    pub(crate) python_install_dir: Option<PathBuf>,
     pub(crate) no_progress: bool,
     pub(crate) installer_metadata: bool,
 }
@@ -159,6 +160,18 @@ impl GlobalSettings {
             .combine(env(env::UV_PYTHON_DOWNLOADS))
             .combine(workspace.and_then(|workspace| workspace.globals.python_downloads))
             .unwrap_or_default(),
+            python_install_dir: args
+                .python_install_dir
+                .clone()
+                .or_else(|| {
+                    std::env::var(EnvVars::UV_PYTHON_INSTALL_DIR)
+                        .ok()
+                        .filter(|v| !v.is_empty())
+                        .map(PathBuf::from)
+                })
+                .or_else(|| {
+                    workspace.and_then(|workspace| workspace.globals.python_install_dir.clone())
+                }),
             // Disable the progress bar with `RUST_LOG` to avoid progress fragments interleaving
             // with log messages.
             no_progress: resolve_flag(args.no_progress, "no-progress", environment.no_progress)
@@ -1287,7 +1300,7 @@ impl PythonInstallSettings {
     /// Resolve the [`PythonInstallSettings`] from the CLI and filesystem configuration.
     pub(crate) fn resolve(
         args: PythonInstallArgs,
-        filesystem: Option<FilesystemOptions>,
+        filesystem: Option<&FilesystemOptions>,
         environment: EnvironmentOptions,
     ) -> Self {
         let filesystem_install_mirrors = filesystem
@@ -1323,7 +1336,13 @@ impl PythonInstallSettings {
         } = args;
 
         Self {
-            install_dir,
+            install_dir: install_dir
+                .or(environment.python_install_dir.clone())
+                .or_else(|| {
+                    filesystem
+                        .as_ref()
+                        .and_then(|fs| fs.globals.python_install_dir.clone())
+                }),
             targets,
             reinstall,
             force,

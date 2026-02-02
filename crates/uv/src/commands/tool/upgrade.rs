@@ -3,6 +3,7 @@ use itertools::Itertools;
 use owo_colors::{AnsiColors, OwoColorize};
 use std::collections::BTreeMap;
 use std::fmt::Write;
+use std::path::Path;
 use std::str::FromStr;
 use tracing::{debug, trace};
 
@@ -50,6 +51,7 @@ pub(crate) async fn upgrade(
     python_downloads: PythonDownloads,
     installer_metadata: bool,
     concurrency: Concurrency,
+    install_dir: Option<&Path>,
     cache: &Cache,
     printer: Printer,
     preview: Preview,
@@ -100,6 +102,7 @@ pub(crate) async fn upgrade(
                 install_mirrors.python_install_mirror.as_deref(),
                 install_mirrors.pypy_install_mirror.as_deref(),
                 install_mirrors.python_downloads_json_url.as_deref(),
+                install_dir,
                 preview,
             )
             .await?

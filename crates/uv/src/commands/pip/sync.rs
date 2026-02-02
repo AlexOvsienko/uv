@@ -1,5 +1,6 @@
 use std::collections::BTreeSet;
 use std::fmt::Write;
+use std::path::Path;
 
 use anyhow::{Context, Result};
 use owo_colors::OwoColorize;
@@ -88,6 +89,7 @@ pub(crate) async fn pip_sync(
     sources: NoSources,
     python_preference: PythonPreference,
     concurrency: Concurrency,
+    install_dir: Option<&Path>,
     cache: Cache,
     dry_run: DryRun,
     printer: Printer,
@@ -173,6 +175,7 @@ pub(crate) async fn pip_sync(
             install_mirrors.python_install_mirror.as_deref(),
             install_mirrors.pypy_install_mirror.as_deref(),
             install_mirrors.python_downloads_json_url.as_deref(),
+            install_dir,
             preview,
         )
         .await?;
@@ -186,6 +189,7 @@ pub(crate) async fn pip_sync(
                 .unwrap_or_default(),
             EnvironmentPreference::from_system_flag(system, true),
             PythonPreference::default().with_system_flag(system),
+            install_dir,
             &cache,
             preview,
         )?;

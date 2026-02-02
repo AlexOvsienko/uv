@@ -119,6 +119,7 @@ pub(crate) async fn pip_compile(
     python_preference: PythonPreference,
     concurrency: Concurrency,
     quiet: bool,
+    install_dir: Option<&Path>,
     cache: Cache,
     printer: Printer,
     preview: Preview,
@@ -300,6 +301,7 @@ pub(crate) async fn pip_compile(
             install_mirrors.python_install_mirror.as_deref(),
             install_mirrors.pypy_install_mirror.as_deref(),
             install_mirrors.python_downloads_json_url.as_deref(),
+            install_dir,
             preview,
         )
         .await
@@ -323,6 +325,7 @@ pub(crate) async fn pip_compile(
             install_mirrors.python_install_mirror.as_deref(),
             install_mirrors.pypy_install_mirror.as_deref(),
             install_mirrors.python_downloads_json_url.as_deref(),
+            install_dir,
             preview,
         )
         .await

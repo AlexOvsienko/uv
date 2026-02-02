@@ -83,6 +83,7 @@ pub(crate) async fn refine_interpreter(
     install_mirrors: &PythonInstallMirrors,
     python_preference: PythonPreference,
     python_downloads: PythonDownloads,
+    install_dir: Option<&Path>,
     cache: &Cache,
     preview: Preview,
 ) -> anyhow::Result<Option<Interpreter>, ProjectError> {
@@ -148,6 +149,7 @@ pub(crate) async fn refine_interpreter(
         install_mirrors.python_install_mirror.as_deref(),
         install_mirrors.pypy_install_mirror.as_deref(),
         install_mirrors.python_downloads_json_url.as_deref(),
+        install_dir,
         preview,
     )
     .await?
